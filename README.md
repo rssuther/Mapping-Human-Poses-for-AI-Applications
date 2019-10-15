@@ -1,4 +1,4 @@
-# Mapping-Human-poses-for-AI-applications
+# Mapping Human Posesf for AI Applications
 
 ## Overview
 

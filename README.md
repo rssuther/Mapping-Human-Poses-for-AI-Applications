@@ -18,6 +18,8 @@ Our goal is to visually identify and track human poses and movements. These iden
 ## Microsoft Azure Kinnect SDK
 
 [Azure Kinect SDK Documentation](https://docs.microsoft.com/en-us/azure/Kinect-dk/)
+[Azure Kinect Sensor SDK Download](https://docs.microsoft.com/en-us/azure/Kinect-dk/sensor-sdk-download)
+[Azure Kinect Body Tracking SDK Download](https://docs.microsoft.com/en-us/azure/Kinect-dk/body-sdk-download)
 
 
 ## Installation

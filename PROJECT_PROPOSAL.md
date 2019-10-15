@@ -1,8 +1,10 @@
-### Cal Poly SLO                CSC 480-F19 Artificial Intelligence                 Prof. Franz J. Kurfess
+<u> _CSC 480-F19 Artificial Intelligence_ </u>
+<u> _Cal Poly SLO_ </u>
+<u> _Prof. Franz J. Kurfess_ </u>
 
 # Mapping-Human-poses-for-AI-applications
-## Dream Team - Mapping Human Poses to a Formal Notation
-## Arun Ulagappan, Reid Sutherland, Luke Matusiak, Colin VanDervoort, Eleanor Lewis, Rattil Chowdhury
+### Dream Team - Mapping Human Poses to a Formal Notation
+#### Arun Ulagappan, Reid Sutherland, Luke Matusiak, Colin VanDervoort, Eleanor Lewis, Rattil Chowdhury
 
 ### Overview
 The purpose of this project is to produce a body-motion tracking and recognition system that enables movements of the human body to be identified. The system will describe extensively and completely the motion of the human body in a notation that will be passed into a machine learning model to recognize various motions and poses. These poses will then be labeled and identified by the system to relay useful information about the motion. For example, with ground traffic control signals at the airport, the system could recognize the particular directives of the ground crew, and relay this information to the pilot or planes computer system.

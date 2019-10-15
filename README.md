@@ -19,29 +19,33 @@ Our goal is to visually identify and track human poses and movements. These iden
 
 ### Minimum host PC hardware requirements
 The PC host hardware requirement is dependent on application/algorithm/sensor frame rate/resolution executed on host PC. Recommended minimum Sensor SDK configuration for Windows is:
-
-  Seventh Gen Intel® CoreTM i3 Processor (Dual Core 2.4 GHz with HD620 GPU or faster)
   
-  4 GB Memory
+  ```
+  - Seventh Gen Intel® CoreTM i3 Processor (Dual Core 2.4 GHz with HD620 GPU or faster)
   
-  Dedicated USB3 port
+  - 4 GB Memory
   
-  Graphics driver support for OpenGL 4.4 or DirectX 11.0
+  - Dedicated USB3 port
   
-  Lower end or older CPUs may also work depending on your use-case.
-
+  - Graphics driver support for OpenGL 4.4 or DirectX 11.0
+  
+  - Lower end or older CPUs may also work depending on your use-case.
+  ```
+  
 Performance differs also between Windows/Linux operating systems and graphics drivers in use.
 
 ### Body tracking host PC hardware requirements
 The body tracking PC host requirement is more stringent than the general PC host requirement. Recommended minimum Body Tracking SDK configuration for Windows is:
-
-  Seventh Gen Intel® CoreTM i5 Processor (Quad Core 2.4 GHz or faster)
   
-  4 GB Memory
+  ```
+  - Seventh Gen Intel® CoreTM i5 Processor (Quad Core 2.4 GHz or faster)
   
-  NVIDIA GEFORCE GTX 1070 or better
+  - 4 GB Memory
   
-  Dedicated USB3 port
+  - NVIDIA GEFORCE GTX 1070 or better
+  
+  - Dedicated USB3 port
+  ```
 
 [Azure Kinect SDK Documentation](https://docs.microsoft.com/en-us/azure/Kinect-dk/)
 

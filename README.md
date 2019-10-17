@@ -16,11 +16,6 @@ Aircraft signals vary slightly among the North Atlantic Treaty Organization (NAT
 
 ## Functionality
 
-## OpenPose
-
-[OpenPose GitHub Repo](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
-
-
 ## Microsoft Azure Kinnect SDK
 
 ### Minimum host PC hardware requirements

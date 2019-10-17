@@ -8,6 +8,12 @@ Our goal is to visually identify and track human poses and movements. These iden
 
 ## Background
 
+### Aircraft Marshalling Signals
+
+Aircraft signals vary slightly among the North Atlantic Treaty Organization (NATO) Standardization Agreement 3117, Air Standardization Coordinating Committee Air Standard 44/42A, the Appendix 1 of the Annex 2 to the Chicago Convention on International Civil Aviation, and Federal Aviation Administration (FAA) signals. the US Air Force generally follows ICAO guidance if its guidance conflicts with FAA, ICAO, or NATO documents. The ICAO defines numerous important codes for use in international aviation.
+
+![Aircraft Marshalling Signals](documentation_assets/aircraft_marshalling_signals.png)
+
 ## Functionality
 
 ## OpenPose

@@ -1,0 +1,42 @@
+@startuml capture_activity
+
+start
+
+partition Initialization {
+  :open device and start camera;
+  :create a body tracker;
+}
+
+partition Running {
+  while (skeletons needed?) is (yes)
+    :get a sensor capture;
+    :enqueue capture;
+    note right
+      captures are processed asyncronously
+      from the input queue to produce body
+      tracking results
+    end note
+    :release sensor capture;
+    :pop body frame results;
+    note right
+      a timeout value can be set to determine
+      how long to wait for results from the
+      output queue (or infinity to wait forever)
+    end note
+    :transmit downstream;
+    note right
+      we will implement a FIFO queue that
+      feeds body tracking data to a RNN
+    end note
+    :release body frame;
+  endwhile (no)
+}
+
+partition Cleanup {
+  :shut down body tracker;
+  :stop cameras and close device;
+}
+
+stop
+
+@enduml

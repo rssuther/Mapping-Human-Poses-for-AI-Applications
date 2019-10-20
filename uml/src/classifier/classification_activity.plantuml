@@ -1,0 +1,28 @@
+@startuml classification_activity
+
+start
+
+partition Initialization {
+  :load RNN model;
+  :setup pipe or shared memory;
+}
+
+partition Running {
+  while (application running) is (yes)
+    :try to read from pipe or shared memory;
+    :write body frame info to four second circular buffer;
+    if(buffer full) then (yes)
+      :pass last four seconds of frame info to RNN;
+      :print classification and confidence to stdout;
+    else (no)
+    endif 
+  endwhile (no)
+}
+
+partition Cleanup {
+  :destroy infrastructure for IPC with Azure Kinect client program;
+}
+
+stop
+
+@enduml

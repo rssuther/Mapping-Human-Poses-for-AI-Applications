@@ -5,34 +5,32 @@ start
 partition Initialization {
   :open device and start camera;
   :create a body tracker;
+  :setup pipe or shared memory;
 }
 
 partition Running {
-  while (skeletons needed?) is (yes)
+  while (application running) is (yes)
     :get a sensor capture;
     :enqueue capture;
     note right
-      captures are processed asyncronously
+      Captures are processed asyncronously
       from the input queue to produce body
-      tracking results
+      tracking results.
     end note
     :release sensor capture;
     :pop body frame results;
     note right
-      a timeout value can be set to determine
+      A timeout value can be set to determine
       how long to wait for results from the
-      output queue (or infinity to wait forever)
+      output queue (or infinity to wait forever).
     end note
-    :transmit downstream;
-    note right
-      we will implement a FIFO queue that
-      feeds body tracking data to a RNN
-    end note
+    :send body frame results to classifier program;
     :release body frame;
   endwhile (no)
 }
 
 partition Cleanup {
+  :destroy infrastructure for IPC with classifier program;
   :shut down body tracker;
   :stop cameras and close device;
 }

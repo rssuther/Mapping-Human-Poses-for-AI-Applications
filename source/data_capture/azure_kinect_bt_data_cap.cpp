@@ -33,6 +33,13 @@ k4abt_tracker_t tracker = NULL;
 k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
 k4abt_frame_t body_frame = NULL;
 
+//Data Resources
+char filename[1024] = {'\0'};
+FILE* data_file = NULL;
+int CONT_MODE = 1;
+
+
+
 int init_device(void){
 
     printf("Opening Azure Kinect Device for Capture\n");
@@ -60,14 +67,14 @@ int init_bt(void){
 
 }
 
-int get_device_bt_capture(int* frame_count){
+int get_device_bt_capture(unsigned long* frame_number, k4abt_skeleton_t* body_skel){
 
     // Capture Wait Result 
 	k4a_wait_result_t capture_result = K4A_WAIT_RESULT_SUCCEEDED;
     k4a_wait_result_t q_capture_result = K4A_WAIT_RESULT_SUCCEEDED;
     k4a_wait_result_t pop_frame_result = K4A_WAIT_RESULT_SUCCEEDED;
 
-    k4abt_skeleton_t body_skel;
+    //k4abt_skeleton_t body_skel;
 
 
     // Fet Sensor Capture from Device
@@ -75,7 +82,7 @@ int get_device_bt_capture(int* frame_count){
 
     if (q_capture_result == K4A_WAIT_RESULT_SUCCEEDED){
 
-        frame_count++;
+        frame_number++;
 
         // Enque Sensor Capture Result tor Tracking
         q_capture_result = k4abt_tracker_enqueue_capture(tracker, device_capture, K4A_WAIT_INFINITE);
@@ -106,7 +113,7 @@ int get_device_bt_capture(int* frame_count){
 
             size_t num_bodies = k4abt_frame_get_num_bodies(body_frame);
             printf("%zu bodies are detected!\n", num_bodies);
-
+            
             k4abt_frame_get_body_skeleton(body_frame, 0, &body_skel);
 
             int i = 0;
@@ -192,7 +199,92 @@ int clean_up(void){
     k4a_device_stop_cameras(device);
     k4a_device_close(device);
 
+    data_file.close();
+
 	return 0;
+
+}
+
+int write_output(unsigned long seq_number, unsigned long frame_number, k4abt_skeleton_t body_skel){
+
+    char str_output[2048] = {'\0'};
+
+    str_output = str(seq_number) + ", " + str(frame_number) + ", " + str(body_skel) + "\n";
+
+    fputs(str_output, data_file);
+
+    return 0;
+
+}
+
+int do_one(){
+
+    k4abt_skeleton_t body_skel;
+    unsigned long frame_number = 0;
+    unsigned long seq_number
+
+    if (-1 == get_device_bt_capture(&frame_number, &body_skel)){
+        cout << "An Error Occured Capturing a Body Skel" << endl << endl;
+    }
+
+    write_output(seq_number, frame_number, body_skel);
+
+    return 0;
+}
+
+int do_continuous(unsigned long seq_len){
+    
+    k4abt_skeleton_t body_skel;
+    unsigned long frame_number = 0;
+    unsigned long seq_number = 0;
+
+    unsigned long num_frames_seq = device_config.framerate * seq_len;
+
+    do {
+        if (-1 == get_device_bt_capture(&frame_number, &body_skel)){
+            cout << "An Error Occured Capturing a Body Skel" << endl << endl;
+        }   
+
+        write_output(seq_number, frame_number, body_skel);
+
+        Sleep(1000);
+
+        if (frame_number == num_frames_seq){
+
+            frame_number = 0;
+            seq_number++;
+
+        }
+
+    } while (seq_number < 100);
+
+    return 0;
+}
+
+int parse_input(int argc, char* argv){
+
+    if !(argc >= 3){
+        cout << "Error: Invalid Number of Inputs Provided\n" << endl;
+        exit(EXIT_FAILURE);
+    }
+
+    if (strcmp(argv[1][0], "-")){
+
+        if (strcmp(argv[1][1], "f")){
+
+            strcpy(filename, argv[2]);
+
+            cout << "Data Filepath set to: " << filename << "\n" << endl;
+
+        }
+    }
+
+    return 0;
+}
+
+int init_data_file(){
+
+    data_file = fopen(filename, 'w+');
 
 }
 
@@ -202,13 +294,18 @@ int main(void){
 
     init_device();
     init_bt();
+    init_data_file();
 
-    do {
-        get_device_bt_capture(&frame_count);
+    if (CONT_MODE){
 
-        Sleep(1000);
+        do_continuous();
 
-    } while (frame_count < 100);
+    }
+    else {
+
+        do_one();
+
+    }
 
     printf("Finished Body Tracking Processing\n");
 

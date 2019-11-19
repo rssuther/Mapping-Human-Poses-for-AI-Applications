@@ -22,7 +22,7 @@ import ctypes
 #from k4apy.k4a_types import *
 
 
-class K4A:
+class K4ABT:
     """Class that handles top-level transactions between python and k4a.dll.
 
     ================= =============== =========================================

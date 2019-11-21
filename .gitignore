@@ -33,3 +33,16 @@
 *.exe
 *.out
 *.app
+
+# Other
+*.def
+*.o
+*.out
+*.tmp
+*.so
+*.so.*
+*.a
+test/
+build
+build.*
+*.swp

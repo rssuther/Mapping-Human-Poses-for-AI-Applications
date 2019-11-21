@@ -23,23 +23,15 @@ using namespace std;
 
 #define TIMEOUT_IN_MS 20;
 
-/*
+
 // Device Capture Resources
-k4a_device_t device = NULL;
-k4a_device_configuration_t device_config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
-k4a_capture_t device_capture = NULL;
+extern k4a_device_configuration_t device_config;
+volitile extern k4a_capture_t device_capture;
 
 // Body Tracking Resources
-k4a_calibration_t sensor_calibration;
-k4abt_tracker_t tracker = NULL;
-k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
-k4abt_frame_t body_frame = NULL;
+extern k4abt_tracker_configuration_t tracker_config;
+volitile extern k4abt_frame_t body_frame;
 
-//Data Resources
-char filename[1024] = { '\0' };
-FILE* data_file = NULL;
-int CONT_MODE = 1;
-*/
 
 
 
@@ -51,7 +43,7 @@ int get_device_bt_capture(unsigned long* frame_number, k4abt_skeleton_t* body_sk
 
 int clean_up(void);
 
-int write_output(unsigned long seq_number, unsigned long frame_number, k4abt_skeleton_t body_skel);
+int print_output(unsigned long seq_number, unsigned long frame_number, k4abt_skeleton_t body_skel);
 
 int do_one();
 

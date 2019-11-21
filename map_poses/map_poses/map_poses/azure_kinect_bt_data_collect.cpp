@@ -1,3 +1,12 @@
+/**
+ * Mapping Human Poses
+ * 
+ * azure_kinect_bt_data_collect.cpp
+ * @author Reid Sutherland
+ * @date 09/20/19
+ * 
+ * */
+
 #include "azure_kinect_bt_data_collect.h"
 
 using namespace std;
@@ -59,6 +68,22 @@ int init_bt(void) {
 	VERIFY(k4abt_tracker_create(&sensor_calibration, tracker_config, &tracker), "Body Tracker Initialization Failed...");
 
 	return 0;
+
+}
+
+/*
+	*	clean_up()
+	*	
+	*	Closes and Releases Resources
+	*	
+	*
+*/
+void clean_up(void) {
+
+	k4abt_tracker_shutdown(tracker);
+	k4abt_tracker_destroy(tracker);
+	k4a_device_stop_cameras(device);
+	k4a_device_close(device);
 
 }
 
@@ -159,23 +184,7 @@ int get_device_bt_capture(unsigned long* frame_number, k4abt_skeleton_t* body_sk
 }
 
 /*
-	*	clean_up()
-	*	
-	*	Closes and Releases Resources
-	*	
-	*
-*/
-void clean_up(void) {
-
-	k4abt_tracker_shutdown(tracker);
-	k4abt_tracker_destroy(tracker);
-	k4a_device_stop_cameras(device);
-	k4a_device_close(device);
-
-}
-
-/*
-	*	print_output()
+	*	print_body_skeleton()
 	*	
 	*	Prints Body Skeleton Data to Output Console
 	*
@@ -193,7 +202,7 @@ void clean_up(void) {
 	*	Returns 0
 	*
 */
-int print_output(unsigned long seq_number, unsigned long frame_number, k4abt_skeleton_t body_skel) {
+int print_body_skeleton(unsigned long seq_number, unsigned long frame_number, k4abt_skeleton_t body_skel) {
 
 	printf("Body Skeliton Joint:\n");
 
@@ -259,7 +268,7 @@ int do_one() {
 	}
 
 	if (VERBOSE){
-		write_output(seq_number, frame_number, body_skel);
+		print_body_skeleton(seq_number, frame_number, body_skel);
 	}
 
 	return 0;
@@ -291,7 +300,7 @@ int do_continuous(unsigned long seq_len) {
 		}
 
 		if (VERBOSE){
-			write_output(seq_number, frame_number, body_skel);
+			print_body_skeleton(seq_number, frame_number, body_skel);
 		}
 
 		Sleep(1000);
@@ -324,7 +333,7 @@ int do_continuous(unsigned long seq_len) {
 int parse_user_input(int argc, char* argv[]){
 
 	int i = 0;
-	
+
 	if (argc > 5){
 		cout << "Invalid Number of Inputs" << endl << endl;
 		print_usage();

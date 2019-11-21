@@ -1,4 +1,12 @@
-#pragma once
+/**
+ * Mapping Human Poses
+ * 
+ * azure_kinect_bt_data_collect.h
+ * @author Reid Sutherland
+ * @date 09/20/19
+ * 
+ * */
+
 #pragma once
 
 #include <stdio.h>
@@ -34,21 +42,73 @@ volitile extern k4abt_frame_t body_frame;
 
 
 
-
+/*
+	*	init_device()
+	*
+	*	Initilizes Connected Device at DeviceIndex = 0
+	*
+	*	Returns 0
+	*
+*/
 int init_device(void);
 
+/*
+	*	init_bt)
+	*
+	*	Initilizes Body Tracking Engine for Specific Device Parameters
+	*
+	*	Returns 0
+	*
+*/
 int init_bt(void);
 
-int get_device_bt_capture(unsigned long* frame_number, k4abt_skeleton_t* body_skel);
-
+/*
+	*	clean_up()
+	*	
+	*	Closes and Releases Resources
+	*	
+	*
+*/
 int clean_up(void);
 
-int print_output(unsigned long seq_number, unsigned long frame_number, k4abt_skeleton_t body_skel);
+/*
+	*	get_device_bt_capture()
+	*	
+	*	Captures One Frame from the Connected Device
+	*	Passes Frame into Body Tracking Engine 
+	*		to Detect Body Skeletons
+	*	Data is Placed in body_skel
+	*
+	*	@param  unsigned long* frame_number
+	*				Pointer to Current Frame Number Counter
+	*
+	*	@param  k4abt_skeleton_t* body_skel
+	*				Pointer to Body Skeleton Data
+	*
+	*	@onerror return -1
+	*	
+	*	Returns 0
+	*
+*/
+int get_device_bt_capture(unsigned long* frame_number, k4abt_skeleton_t* body_skel);
 
-int do_one();
-
-int do_continuous(unsigned long seq_len);
-
-//int parse_input(int argc, char* argv);
-
-//int init_data_file();
+/*
+	*	print_body_skeleton()
+	*	
+	*	Prints Body Skeleton Data to Output Console
+	*
+	*	@param  unsigned long seq_number
+	*				Current Sequence Number Counter
+	*
+	*	@param  unsigned long frame_number
+	*				Current Frame Number Counter
+	*
+	*	@param  k4abt_skeleton_t body_skel
+	*				Body Skeleton Data
+	*
+	*	@onerror return -1
+	*	
+	*	Returns 0
+	*
+*/
+int print_body_skeleton(unsigned long seq_number, unsigned long frame_number, k4abt_skeleton_t body_skel);

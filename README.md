@@ -59,5 +59,32 @@ The body tracking PC host requirement is more stringent than the general PC host
 
 ## Usage
 
+### Using k4abt_data_collect.cpp
+
+In order to use the Azure Kinect Body Tracking data collection functions, include k4abt_data_collect.h to access relevant functions.
+  
+  #### Required Functions Calls
+  - Must call `init_device()` first to set up the Azure Kinect DK.
+  - Next call `init_bt()` to set up the Azure Kinect Body Tracking Engine.
+  - To collect body skeleton data use the `get_device_bt_capture()` function. 
+      - This function will place a single body skeleton in the `k4abt_skeleton_t*` 
+        pointer reference passed in to the functions third parameter. 
+      - Call this function repeatedly to capture continuous body skeletons.
+        See source code functions `do_one()` and `do_continuous()` for example usage.
+  - Call `clean_up()` function to release and close utilized resources.
+  
+  #### Optional Functions Calls
+  - Call `print_body_skeleton()` to output body skeleton data to console.
+  
+  #### Externally Accesable Resources
+  Device Capture Resources
+  `k4a_device_configuration_t device_config`      : Specifies Azure Kinect Sensor Configuration Structure
+  `k4a_capture_t device_capture`                  : Azure Kinect Sensor Capture Structure
+
+  Body Tracking Resources
+  `k4abt_tracker_configuration_t tracker_config`  : Specifies Azure Kinect Body Tracker Configuration Structure
+  `k4abt_frame_t body_frame`                      : Azure Kinect Body Tracking Capture Used for Skeleton Detection
+  
+  
 ## Aknowlegements
 

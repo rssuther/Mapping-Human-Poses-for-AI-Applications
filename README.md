@@ -61,7 +61,7 @@ The body tracking PC host requirement is more stringent than the general PC host
 
 ### Using k4abt_data_collect.cpp
 
-In order to use the Azure Kinect Body Tracking data collection functions, include k4abt_data_collect.h to access relevant functions.
+In order to use the Azure Kinect Body Tracking data collection functions, include k4abt_data_collect.h to access relevant functions. To use the `k4abt_skeleton_t` structure include `k4abt.h`. For other Azure Kinect Sensor API usage include `k4a/k4a.h`.
   
   #### Required Functions Calls
   - Must call `init_device()` first to set up the Azure Kinect DK.

@@ -112,3 +112,52 @@ int get_device_bt_capture(unsigned long* frame_number, k4abt_skeleton_t* body_sk
 	*
 */
 int print_body_skeleton(unsigned long seq_number, unsigned long frame_number, k4abt_skeleton_t body_skel);
+
+/*
+	*	parse_skeleton_to_txt()
+	*	
+	*	Outputs Body Skeleton Data to Costom Format Text File
+	*
+	*	@param  unsigned long seq_number
+	*				Current Sequence Number Counter
+	*
+	*	@param  unsigned long frame_number
+	*				Current Frame Number Counter
+	*
+	*	@param  k4abt_skeleton_t body_skel
+	*				Body Skeleton Data
+	*
+	*	@param  FILE* output_file
+	*				FILE Pointer for Output File
+	*
+	*	@onerror return -1
+	*	
+	*	Returns 0
+	*
+*/
+int parse_skeleton_to_txt(unsigned long seq_number, unsigned long frame_number, k4abt_keleton_t body_skel, FILE* output_file);
+
+/*
+	*	parse_txt_to_skeleton()
+	*	
+	*	Outputs Body Skeleton Data to Costom Format Text File
+	*
+	*	@param  unsigned long* seq_number
+	*				Pointer to Current Sequence Number Counter
+	*
+	*	@param  unsigned long* frame_number
+	*				Pointer to Current Frame Number Counter
+	*
+	*	@param  k4abt_skeleton_t* body_skel
+	*				Pointer to Body Skeleton Data Structure
+	*
+	*	@param  char* input_data
+	*				One Line of the Body Skeleton Data File
+	*
+	*	@onerror return -1
+	*	
+	*	Returns 0
+	*
+*/
+int parse_txt_to_skeleton(unsigned long* seq_number, unsigned long* frame_number, k4abt_keleton_t* body_skel, char* input_data);
+

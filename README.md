@@ -75,6 +75,8 @@ In order to use the Azure Kinect Body Tracking data collection functions, includ
   
   #### Optional Functions Calls
   - Call `print_body_skeleton()` to output body skeleton data to console.
+  - Call `parse_skeleton_to_txt()` in order to output body skeleton data to custom format text file.
+  - Call `parse_txt_to_skeleton()` in order to read in body skeleton data from custom format text file.
   
   #### Externally Accesable Resources
   Device Capture Resources

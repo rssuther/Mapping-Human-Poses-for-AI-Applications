@@ -28,7 +28,7 @@ int VERBOSE = 0;
 int CONTINUOUS = 0;
 int DURRATION = 10;
 int DO_OUTPUT = 0;
-FILE* TXT_FILE_OUT = NULL;
+extern FILE* TXT_FILE_OUT = NULL;
 
 /*
 	*	init_device()
@@ -86,6 +86,10 @@ void clean_up(void) {
 	k4abt_tracker_destroy(tracker);
 	k4a_device_stop_cameras(device);
 	k4a_device_close(device);
+
+	if (TXT_FILE_OUT != NULL){
+		TXT_FILE_OUT.close();
+	}
 
 }
 
@@ -426,6 +430,10 @@ int do_one() {
 		print_body_skeleton(seq_number, frame_number, body_skel);
 	}
 
+	if (TXT_FILE_OUT != NULL){
+			parse_skeleton_to_txt(seq_number, frame_number, body_skel, TXT_FILE_OUT);
+		}
+
 	return 0;
 }
 
@@ -456,6 +464,10 @@ int do_continuous(unsigned long seq_len) {
 
 		if (VERBOSE){
 			print_body_skeleton(seq_number, frame_number, body_skel);
+		}
+
+		if (TXT_FILE_OUT != NULL){
+			parse_skeleton_to_txt(seq_number, frame_number, body_skel, TXT_FILE_OUT);
 		}
 
 		Sleep(1000);

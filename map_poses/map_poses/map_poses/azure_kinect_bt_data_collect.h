@@ -40,7 +40,8 @@ volitile extern k4a_capture_t device_capture;
 extern k4abt_tracker_configuration_t tracker_config;
 volitile extern k4abt_frame_t body_frame;
 
-
+// Data Output Resources
+extern FILE* TXT_FILE_OUT;
 
 /*
 	*	init_device()

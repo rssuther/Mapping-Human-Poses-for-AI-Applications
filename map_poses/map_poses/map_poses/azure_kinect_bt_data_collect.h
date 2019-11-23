@@ -9,17 +9,10 @@
 
 #pragma once
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <string>
-#include <iostream> 
 #include <windows.h>
-
 #include <k4a/k4a.h>
 #include <k4abt.h>
-
-using namespace std;
 
 // Error Checking Macros
 #define VERIFY(result, error)                                                                            \
@@ -29,19 +22,15 @@ using namespace std;
         exit(1);                                                                                         \
     } 
 
-#define TIMEOUT_IN_MS 20;
-
 
 // Device Capture Resources
 extern k4a_device_configuration_t device_config;
-volitile extern k4a_capture_t device_capture;
+extern k4a_capture_t device_capture;
 
 // Body Tracking Resources
 extern k4abt_tracker_configuration_t tracker_config;
-volitile extern k4abt_frame_t body_frame;
+extern k4abt_frame_t body_frame;
 
-// Data Output Resources
-extern FILE* TXT_FILE_OUT;
 
 /*
 	*	init_device()
@@ -70,7 +59,7 @@ int init_bt(void);
 	*	
 	*
 */
-int clean_up(void);
+void clean_up(void);
 
 /*
 	*	get_device_bt_capture()
@@ -128,15 +117,15 @@ int print_body_skeleton(unsigned long seq_number, unsigned long frame_number, k4
 	*	@param  k4abt_skeleton_t body_skel
 	*				Body Skeleton Data
 	*
-	*	@param  FILE* output_file
-	*				FILE Pointer for Output File
+	*	@param  string output_file
+	*				File to be opened
 	*
 	*	@onerror return -1
 	*	
 	*	Returns 0
 	*
 */
-int parse_skeleton_to_txt(unsigned long seq_number, unsigned long frame_number, k4abt_keleton_t body_skel, FILE* output_file);
+int parse_skeleton_to_txt(unsigned long seq_number, unsigned long frame_number, k4abt_skeleton_t body_skel, std::ofstream& fileStream);
 
 /*
 	*	parse_txt_to_skeleton()
@@ -160,5 +149,5 @@ int parse_skeleton_to_txt(unsigned long seq_number, unsigned long frame_number, 
 	*	Returns 0
 	*
 */
-int parse_txt_to_skeleton(unsigned long* seq_number, unsigned long* frame_number, k4abt_keleton_t* body_skel, char* input_data);
+int parse_txt_to_skeleton(unsigned long* seq_number, unsigned long* frame_number, k4abt_skeleton_t* body_skel, char* input_data);
 

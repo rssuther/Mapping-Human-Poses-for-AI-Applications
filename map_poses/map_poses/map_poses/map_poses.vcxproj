@@ -137,6 +137,8 @@
     <Import Project="..\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.0\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.targets" Condition="Exists('..\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.0\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.targets')" />
     <Import Project="..\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.0\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.targets" Condition="Exists('..\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.0\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.targets')" />
     <Import Project="..\packages\Microsoft.Azure.Kinect.BodyTracking.0.9.4\build\native\Microsoft.Azure.Kinect.BodyTracking.targets" Condition="Exists('..\packages\Microsoft.Azure.Kinect.BodyTracking.0.9.4\build\native\Microsoft.Azure.Kinect.BodyTracking.targets')" />
+    <Import Project="..\packages\boost.1.71.0.0\build\boost.targets" Condition="Exists('..\packages\boost.1.71.0.0\build\boost.targets')" />
+    <Import Project="..\packages\boost_program_options-vc142.1.71.0.0\build\boost_program_options-vc142.targets" Condition="Exists('..\packages\boost_program_options-vc142.1.71.0.0\build\boost_program_options-vc142.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -146,5 +148,7 @@
     <Error Condition="!Exists('..\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.0\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.0.9.0\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.0\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.0.9.0\build\native\Microsoft.Azure.Kinect.BodyTracking.Dependencies.cuDNN.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Azure.Kinect.BodyTracking.0.9.4\build\native\Microsoft.Azure.Kinect.BodyTracking.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Azure.Kinect.BodyTracking.0.9.4\build\native\Microsoft.Azure.Kinect.BodyTracking.targets'))" />
+    <Error Condition="!Exists('..\packages\boost.1.71.0.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.71.0.0\build\boost.targets'))" />
+    <Error Condition="!Exists('..\packages\boost_program_options-vc142.1.71.0.0\build\boost_program_options-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_program_options-vc142.1.71.0.0\build\boost_program_options-vc142.targets'))" />
   </Target>
 </Project>

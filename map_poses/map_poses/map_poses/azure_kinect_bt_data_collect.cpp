@@ -9,26 +9,37 @@
 
 #include "azure_kinect_bt_data_collect.h"
 
-using namespace std;
+#include <cstdlib>
+#include <iostream>
+#include <fstream>
+#include <string.h>
+#include <boost/program_options.hpp>
 
+#define TIMEOUT_IN_MS 20;
+
+using namespace std;
+namespace po = boost::program_options;
 
 // Device Capture Resources
 k4a_device_t device = NULL;
 extern k4a_device_configuration_t device_config = K4A_DEVICE_CONFIG_INIT_DISABLE_ALL;
-volitile extern k4a_capture_t device_capture = NULL;
+//volatile extern k4a_capture_t device_capture = NULL;
+extern k4a_capture_t device_capture = NULL;
 
 // Body Tracking Resources
 k4a_calibration_t sensor_calibration;
 k4abt_tracker_t tracker = NULL;
 extern k4abt_tracker_configuration_t tracker_config = K4ABT_TRACKER_CONFIG_DEFAULT;
-volitile extern k4abt_frame_t body_frame = NULL;
+//volatile extern k4abt_frame_t body_frame = NULL;
+extern k4abt_frame_t body_frame = NULL;
 
 // Configurations
 int VERBOSE = 0;
 int CONTINUOUS = 0;
 int DURRATION = 10;
 int DO_OUTPUT = 0;
-extern FILE* TXT_FILE_OUT = NULL;
+
+std::ofstream TXT_FILE_OUT;
 
 /*
 	*	init_device()
@@ -80,17 +91,12 @@ int init_bt(void) {
 	*	
 	*
 */
-void clean_up(void) {
+void clean_up() {
 
 	k4abt_tracker_shutdown(tracker);
 	k4abt_tracker_destroy(tracker);
 	k4a_device_stop_cameras(device);
 	k4a_device_close(device);
-
-	if (TXT_FILE_OUT != NULL){
-		TXT_FILE_OUT.close();
-	}
-
 }
 
 /*
@@ -219,11 +225,11 @@ int print_body_skeleton(unsigned long seq_number, unsigned long frame_number, k4
 		cout << "\t\tY: " << body_skel.joints[i].position.xyz.y << endl;
 		cout << "\t\tZ: " << body_skel.joints[i].position.xyz.z << endl;
 
-		cout << "\tJoint Orrientation WXYZ: " endl;
+		cout << "\tJoint Orrientation WXYZ: " << endl;
 		cout << "\t\tW: " << body_skel.joints[i].orientation.wxyz.w << endl;
 		cout << "\t\tX: " << body_skel.joints[i].orientation.wxyz.x << endl;
-		cout << "\t\tY: " << body_skel.joints[i].orientation.wxyz.y endl;
-		cout << "\t\tZ: " << body_skel.joints[i].orientation.wxyz.z endl;
+		cout << "\t\tY: " << body_skel.joints[i].orientation.wxyz.y << endl;
+		cout << "\t\tZ: " << body_skel.joints[i].orientation.wxyz.z << endl;
 		
 		cout << "\tJoint Confidence: " << endl;
 
@@ -276,24 +282,23 @@ int print_body_skeleton(unsigned long seq_number, unsigned long frame_number, k4
 	*	Returns 0
 	*
 */
-int parse_skeleton_to_txt(unsigned long seq_number, unsigned long frame_number, k4abt_keleton_t body_skel, FILE* output_file){
+int parse_skeleton_to_txt(unsigned long seq_number, unsigned long frame_number, k4abt_skeleton_t body_skel, std::ofstream& fileStream){
 
 	char output_data[2048] = {'\0'};
-	k4a_float3_t joint_pos = NULL;
-	k4a_quaternion_t joint_orr = NULL;
+	k4a_float3_t joint_pos;
+	k4a_quaternion_t joint_orr;
 	int joint_conf = K4ABT_JOINT_CONFIDENCE_NONE;
 
-	if (output_file == NULL){
-
+	if (fileStream.is_open()){
 		cout << "Invalid call of parse_skeleton_to_txt(): File Not Specified" << endl << endl;
 		return -1;
-
 	}
 
-	sprintf(output_data, "%ul %ul : ", seq_number, frame_number);
-	output_file.write(output_data);
+	sprintf_s(output_data, sizeof(output_data), "%ul %ul : ", seq_number, frame_number);
 
-	output_data = {'\0'};
+	fileStream << output_data << endl;
+
+	//output_data = {'\0'};  Not sure of purpose
 
 	for (int i = 0; i < 25; i++) {
 
@@ -318,15 +323,15 @@ int parse_skeleton_to_txt(unsigned long seq_number, unsigned long frame_number, 
 				break;
 		}
 
-		sprintf(output_data, "%d %f %f %f %f %f %f %f %d : ", i, joint_pos.xyz.x, joint_pos.xyz.y, joint_pos.xyz.z, joint_orr.wxyz.w, joint_orr.wxyz.x, joint_orr.wxyz.y, joint_orr.wxyz.z, joint_conf);
+		sprintf_s(output_data, sizeof(output_data), "%d %f %f %f %f %f %f %f %d : ", i, joint_pos.xyz.x, joint_pos.xyz.y, joint_pos.xyz.z, joint_orr.wxyz.w, joint_orr.wxyz.x, joint_orr.wxyz.y, joint_orr.wxyz.z, joint_conf);
 
 		
-		output_file.write(output_data);
-		output_file.write("\n");
+		fileStream << output_data, 'n';
+		fileStream.close();
 
 	}
 
-	return 0
+	return 0;
 
 }
 
@@ -352,12 +357,13 @@ int parse_skeleton_to_txt(unsigned long seq_number, unsigned long frame_number, 
 	*	Returns 0
 	*
 */
-int parse_txt_to_skeleton(unsigned long* seq_number, unsigned long* frame_number, k4abt_keleton_t* body_skel, char* input_data){
+int parse_txt_to_skeleton(unsigned long* seq_number, unsigned long* frame_number, k4abt_skeleton_t* body_skel, char* input_data){
 
-	k4a_float3_t joint_pos = NULL;
-	k4a_quaternion_t joint_orr = NULL;
+	k4a_float3_t joint_pos ;
+	k4a_quaternion_t joint_orr;
 	int joint_conf = K4ABT_JOINT_CONFIDENCE_NONE;
-	char* parameters = NULL;
+	char* parameter = NULL;
+	char* next_parameter = NULL;
 
 	float xyz_x = 0;
 	float xyz_y = 0;
@@ -368,27 +374,25 @@ int parse_txt_to_skeleton(unsigned long* seq_number, unsigned long* frame_number
 	float wxyz_z = 0;
 	int confidence = 0;
 
-	if (strcmp(input_data[0], "\n")){
-
+	if (input_data[0] == '\n'){
 		cout << "End of Input Data File Reached" << endl << endl;
 		return 1;
-
 	}
 
-	parameters = strtok(input_data, ":");
+	parameter = strtok_s(input_data, ":", &next_parameter);
 	
-	while(parameters != NULL){
+	while(parameter != NULL){
 
-		sscanf(parameters, "%ul %ul", *seq_number, *frame_number);
+		sscanf_s(parameter, "%lu %lu", seq_number, frame_number);
 		
 		for (int i = 0; i < 25; i++) {
-			parameters = strtok(NULL, ":");
-			
-			sscanf(parameters, "%*d %f %f %f %f %f %f %f %d", 
+			parameter = strtok_s(NULL, ":", &next_parameter);
+
+			sscanf_s(parameter, "%*d %f %f %f %f %f %f %f %d",
 				&xyz_x, &xyz_y, &xyz_z,
 				&wxyz_w, &wxyz_x, &wxyz_y, &wxyz_z,
 				&confidence
-				);
+			);
 
 			body_skel->joints[i].position.xyz.x = xyz_x;
 			body_skel->joints[i].position.xyz.y = xyz_y;
@@ -400,10 +404,11 @@ int parse_txt_to_skeleton(unsigned long* seq_number, unsigned long* frame_number
 			body_skel->joints[i].orientation.wxyz.z = wxyz_z;
 
 			body_skel->joints[i].confidence_level = (k4abt_joint_confidence_level_t)confidence;
+		}
 			
 	}
 
-	return 0
+	return 0;
 
 }
 
@@ -430,7 +435,7 @@ int do_one() {
 		print_body_skeleton(seq_number, frame_number, body_skel);
 	}
 
-	if (TXT_FILE_OUT != NULL){
+	if (!(TXT_FILE_OUT.is_open())){
 			parse_skeleton_to_txt(seq_number, frame_number, body_skel, TXT_FILE_OUT);
 		}
 
@@ -466,7 +471,7 @@ int do_continuous(unsigned long seq_len) {
 			print_body_skeleton(seq_number, frame_number, body_skel);
 		}
 
-		if (TXT_FILE_OUT != NULL){
+		if (!(TXT_FILE_OUT.is_open())) {
 			parse_skeleton_to_txt(seq_number, frame_number, body_skel, TXT_FILE_OUT);
 		}
 
@@ -497,70 +502,36 @@ int do_continuous(unsigned long seq_len) {
 	*	Returns 0
 	*
 */
-int parse_user_input(int argc, char* argv[]){
+void parse_user_input(po::variables_map vm){
 
-	int i = 0;
+	// File Specifier
+	if (vm.count("-f")) {
 
-	if (argc > 7){
-		cout << "Invalid Number of Inputs" << endl << endl;
-		print_usage();
-		exit(EXIT_FAILURE);
-	}
-
-	if (argc >= 2 || argc <= 7){
-
-		for (i = 1; i < argc; i++){
-			
-			switch(argv[i]){
-				
-				// Verbose Mode
-				case "-f":
-
-					DO_OUTPUT = 1;
-					TXT_FILE_OUT = fopen(argv[++i], "w+");
-					break;
-
-				// Verbose Mode
-				case "-v":
-
-					VERBOSE = 1;
-					break;
-
-				// Continuous Mode
-				case "-c":
-
-					CONTINUOUS = 1;
-					break;
-
-				// Durration Specifier
-				case "-d":
-
-					if (isdigit(argv[++i])){
-
-						DURRATION = atoi(argv[i]);
-
-					}
-					else {
-
-						cout << "Invalid Durration Provided: Using Default 10 Seconds"
-
-					}
-					break;
-
-				// Invalid Input Handler
-				default:
-
-					cout << "Invalid Input Provided" << endl << endl;
-					print_usage();
-					exit(EXIT_FAILURE);
-					break;
-
-			}
-		}
+		DO_OUTPUT = 1;
+		TXT_FILE_OUT.open(vm["-f"].as<string>(), ios::out | ios::trunc);
 
 	}
 
-	return 0;
+	// Verbose Mode
+	if (vm.count("-v")) {
+
+		VERBOSE = 1;
+
+	}
+
+	// Continuous Mode
+	if (vm.count("-c")) {
+
+		CONTINUOUS = 1;
+
+	}
+
+	// Durration Specifier
+	if (vm.count("-d")) {
+
+		DURRATION = vm["-d"].as<int>();
+
+	}
 
 }
 
@@ -586,7 +557,21 @@ void print_usage(void){
 */
 int main(int argc, char* argv[]) {
 
-	parse_user_input();
+	// Setup User Input Parameters
+	po::options_description desc("Allowed options");
+	desc.add_options()
+		("-f", po::value<string>(), "Output File Path")
+		("-v", "Verbose Mode")
+		("-c", "Continuous Mode")
+		("-d", po::value<int>()->default_value(10), "Durration of Capture in Seconds")
+		;
+
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc, argv, desc), vm);
+	po::notify(vm);
+
+	// Parse User Input
+	parse_user_input(vm);
 
 	// Initialise Connected Device
 	init_device();

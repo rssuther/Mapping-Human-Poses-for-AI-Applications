@@ -18,8 +18,8 @@
 #define VERIFY(result, error)                                                                            \
     if(result != K4A_RESULT_SUCCEEDED)                                                                   \
     {                                                                                                    \
-        printf("%s \n - (File: %s, Function: %s, Line: %d)\n", error, __FILE__, __FUNCTION__, __LINE__); \
-        exit(1);                                                                                         \
+        printf("%d %s \n - (File: %s, Function: %s, Line: %d)\n", result, error, __FILE__, __FUNCTION__, __LINE__); \
+        _error_();                                                                                         \
     } 
 
 
@@ -31,6 +31,9 @@ extern k4a_capture_t device_capture;
 extern k4abt_tracker_configuration_t tracker_config;
 extern k4abt_frame_t body_frame;
 
+/*
+*/
+void _error_(void);
 
 /*
 	*	init_device()

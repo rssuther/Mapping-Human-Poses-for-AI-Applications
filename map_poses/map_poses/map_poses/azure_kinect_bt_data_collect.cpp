@@ -9,6 +9,7 @@
 
 #include "azure_kinect_bt_data_collect.h"
 
+#include <csignal>
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -40,6 +41,35 @@ int DURRATION = 10;
 int DO_OUTPUT = 0;
 
 std::ofstream TXT_FILE_OUT;
+
+
+/*
+*/
+void sigHandler(int signal) {
+	cout << "Intteruption Signal Detected. Closing and Releasing Resources" << endl << endl;
+	
+	if (TXT_FILE_OUT.is_open()) {
+		TXT_FILE_OUT.close();
+	}
+
+	clean_up();
+
+	exit(EXIT_FAILURE);
+
+}
+
+
+/*
+*/
+void _error_(void) {
+
+	cout << "An error occured: Releasing resources: Exiting" << endl;
+	clean_up();
+
+	exit(EXIT_FAILURE);
+}
+
+
 
 /*
 	*	init_device()
@@ -289,14 +319,14 @@ int parse_skeleton_to_txt(unsigned long seq_number, unsigned long frame_number, 
 	k4a_quaternion_t joint_orr;
 	int joint_conf = K4ABT_JOINT_CONFIDENCE_NONE;
 
-	if (fileStream.is_open()){
+	if (!(fileStream.is_open())){
 		cout << "Invalid call of parse_skeleton_to_txt(): File Not Specified" << endl << endl;
 		return -1;
 	}
 
-	sprintf_s(output_data, sizeof(output_data), "%ul %ul : ", seq_number, frame_number);
+	sprintf_s(output_data, sizeof(output_data), "%lu %lu : ", seq_number, frame_number);
 
-	fileStream << output_data << endl;
+	fileStream << output_data;
 
 	//output_data = {'\0'};  Not sure of purpose
 
@@ -326,10 +356,11 @@ int parse_skeleton_to_txt(unsigned long seq_number, unsigned long frame_number, 
 		sprintf_s(output_data, sizeof(output_data), "%d %f %f %f %f %f %f %f %d : ", i, joint_pos.xyz.x, joint_pos.xyz.y, joint_pos.xyz.z, joint_orr.wxyz.w, joint_orr.wxyz.x, joint_orr.wxyz.y, joint_orr.wxyz.z, joint_conf);
 
 		
-		fileStream << output_data, 'n';
-		fileStream.close();
+		fileStream << output_data;
 
 	}
+	fileStream << endl;
+	fileStream.flush();
 
 	return 0;
 
@@ -435,9 +466,9 @@ int do_one() {
 		print_body_skeleton(seq_number, frame_number, body_skel);
 	}
 
-	if (!(TXT_FILE_OUT.is_open())){
-			parse_skeleton_to_txt(seq_number, frame_number, body_skel, TXT_FILE_OUT);
-		}
+	if (DO_OUTPUT) {
+		parse_skeleton_to_txt(seq_number, frame_number, body_skel, TXT_FILE_OUT);
+	}
 
 	return 0;
 }
@@ -459,6 +490,7 @@ int do_continuous(unsigned long seq_len) {
 	k4abt_skeleton_t body_skel;
 	unsigned long frame_number = 0;
 	unsigned long seq_number = 0;
+	unsigned long total_frames = 0;
 
 	unsigned long num_frames_seq = device_config.camera_fps * seq_len;
 
@@ -471,11 +503,11 @@ int do_continuous(unsigned long seq_len) {
 			print_body_skeleton(seq_number, frame_number, body_skel);
 		}
 
-		if (!(TXT_FILE_OUT.is_open())) {
+		if (DO_OUTPUT) {
 			parse_skeleton_to_txt(seq_number, frame_number, body_skel, TXT_FILE_OUT);
 		}
 
-		Sleep(1000);
+		//Sleep(1000);
 
 		if (frame_number == num_frames_seq) {
 
@@ -483,8 +515,17 @@ int do_continuous(unsigned long seq_len) {
 			seq_number++;
 
 		}
+		else {
+			frame_number += 1;
+		}
+
+		total_frames++;
 
 	} while (seq_number < num_frames_seq);
+
+	if (TXT_FILE_OUT.is_open()) {
+		TXT_FILE_OUT.close();
+	}
 
 	return 0;
 }
@@ -508,7 +549,7 @@ void parse_user_input(po::variables_map vm){
 	if (vm.count("-f")) {
 
 		DO_OUTPUT = 1;
-		TXT_FILE_OUT.open(vm["-f"].as<string>(), ios::out | ios::trunc);
+		TXT_FILE_OUT.open(vm["-f"].as<string>(), ostream::out | ostream::trunc);
 
 	}
 
@@ -556,6 +597,8 @@ void print_usage(void){
 	*
 */
 int main(int argc, char* argv[]) {
+
+	signal(SIGINT, sigHandler);
 
 	// Setup User Input Parameters
 	po::options_description desc("Allowed options");
